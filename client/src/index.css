@@ -2,6 +2,8 @@
 
 /* ─── Design Tokens ───────────────────────────────────────── */
 :root {
+  color-scheme: dark;
+
   --bg: #0d1117;
   --bg-2: #0a0e14;
   --surface: #161b22;
@@ -107,6 +109,8 @@ img {
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  /* Isolate so its compositing layer never bleeds into #root */
+  isolation: isolate;
 }
 
 .video-bg {
@@ -114,19 +118,28 @@ img {
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Darken the video itself to avoid relying on backdrop-filter overlay */
+  filter: brightness(0.55) saturate(0.75);
 }
 
 .video-bg-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(9, 12, 18, 0.72);
-  backdrop-filter: brightness(0.6) saturate(0.7);
+  /* Plain rgba overlay — NO backdrop-filter here.
+     backdrop-filter with brightness/saturate on a fixed layer
+     creates a broken GPU compositing stacking context in
+     Chromium on Linux (Render), making all sibling z-layers invisible
+     once the video finishes its first load cycle. */
+  background: rgba(9, 12, 18, 0.52);
 }
 
 /* ─── App Shell ───────────────────────────────────────────── */
 #root {
   position: relative;
   z-index: 1;
+  /* Establish an isolated stacking context so fixed-position
+     video layer compositing never corrupts root paint order */
+  isolation: isolate;
 }
 
 .app-wrapper {
@@ -152,10 +165,11 @@ img {
 
 .page-content,
 .editor-page-content {
-  /* Glass surface so all child text is always readable */
-  background: rgba(13, 17, 23, 0.55);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  /* Slightly more opaque so text is readable without backdrop-filter.
+     Removed backdrop-filter: blur here — stacking a backdrop-filter
+     inside an already-composited #root layer caused elements to
+     disappear after paint on production (Render / Chromium Linux). */
+  background: rgba(13, 17, 23, 0.65);
   border-radius: 0;
 }
 
