@@ -1,3 +1,4 @@
+
 /**
  * server/routes/auth.js
  * POST /api/auth/login  — verify credentials, return JWT
@@ -5,10 +6,10 @@
  */
 
 const express = require('express');
-const router  = express.Router();
-const bcrypt  = require('bcryptjs');
-const jwt     = require('jsonwebtoken');
-const db      = require('../db');
+const router = express.Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const db = require('../db');
 const { requireAuth } = require('../auth');
 
 // POST /api/auth/register
