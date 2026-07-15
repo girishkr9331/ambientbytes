@@ -125,6 +125,7 @@ img {
 .video-bg-overlay {
   position: absolute;
   inset: 0;
+  /*new line*/
   /* Plain rgba overlay — NO backdrop-filter here.
      backdrop-filter with brightness/saturate on a fixed layer
      creates a broken GPU compositing stacking context in
