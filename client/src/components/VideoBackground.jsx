@@ -3,7 +3,7 @@ export default function VideoBackground() {
     <div className="video-bg-wrap" aria-hidden="true">
       <img
         className="video-bg"
-        src="/backgrounds/background.webp"
+        src="/backgrounds/background.webp?v=2"
         alt=""
         loading="eager"
       />
