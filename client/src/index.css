@@ -1042,6 +1042,36 @@ img {
 /* Write pane */
 .w-md-editor-content {
   background: var(--surface) !important;
+  overflow: hidden !important;
+}
+
+/* Ensure the editor text write pane is scrollable */
+.w-md-editor-text {
+  overflow-y: auto !important;
+  height: 100% !important;
+}
+
+/* Make scrollbars highly visible and grab-able in both editor panes */
+.w-md-editor-text::-webkit-scrollbar,
+.wmde-markdown::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.w-md-editor-text::-webkit-scrollbar-track,
+.wmde-markdown::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15) !important;
+}
+
+.w-md-editor-text::-webkit-scrollbar-thumb,
+.wmde-markdown::-webkit-scrollbar-thumb {
+  background: var(--text-3) !important;
+  border-radius: 4px !important;
+}
+
+.w-md-editor-text::-webkit-scrollbar-thumb:hover,
+.wmde-markdown::-webkit-scrollbar-thumb:hover {
+  background: var(--text-2) !important;
 }
 
 /* Write pane — font metrics only, NO padding overrides */
