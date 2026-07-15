@@ -142,6 +142,12 @@ img {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Must be above .video-bg-wrap (z-index: 0, position: fixed).
+     Without backdrop-filter (which previously created GPU compositing layers),
+     a non-positioned element is painted BEFORE fixed z-index:0 elements in
+     the stacking order, making all content invisible behind the video. */
+  position: relative;
+  z-index: 2;
 }
 
 .page-content {
