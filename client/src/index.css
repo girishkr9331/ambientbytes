@@ -107,10 +107,12 @@ img {
 .video-bg-wrap {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  /* z-index: -1 guarantees this always paints BEHIND all other content.
+     z-index: 0 was ambiguous — non-positioned siblings (no z-index) are
+     painted before z-index:0 positioned elements, so the video was covering
+     login/signup/dashboard elements. */
+  z-index: -1;
   overflow: hidden;
-  /* No isolation/filter here — extra compositing layers trigger
-     a Chromium/Linux GPU bug that makes backdrop-filter siblings invisible */
 }
 
 .video-bg {
