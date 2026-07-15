@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taskly — Minimal Task Manager</title>
+  <meta name="description" content="A minimal, Notion-style task list app showcasing RESTful API CRUD integration." />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- App Wrapper -->
+  <div class="app-layout">
+    <!-- Notion-like Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="workspace-selector">
+          <span class="workspace-name">Taskly Workspace</span>
+        </div>
+      </div>
+
+      <div class="sidebar-search">
+        <div class="search-box">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="search-input" placeholder="Search tasks..." />
+        </div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div class="menu-section">
+          <h3>Status</h3>
+          <div class="status-menu-items">
+            <button class="menu-item active" data-status="all">
+              <span class="item-label">All Tasks</span>
+            </button>
+            <button class="menu-item" data-status="pending">
+              <span class="item-label">Pending</span>
+            </button>
+            <button class="menu-item" data-status="completed">
+              <span class="item-label">Completed</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-section">
+          <h3>Categories</h3>
+          <div class="category-list" id="category-pills-list">
+            <!-- Dynamic categories go here -->
+          </div>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="footer-sync">Connected to REST API</span>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top navbar-like header for stats -->
+      <header class="page-header">
+        <div class="breadcrumbs">
+          <span class="breadcrumb-root">Workspace</span>
+          <span class="breadcrumb-divider">/</span>
+          <span class="breadcrumb-current">Taskly</span>
+        </div>
+
+        <div class="header-actions">
+          <div class="stats-badges">
+            <span class="stats-badge"><strong id="stats-total">0</strong> tasks</span>
+            <span class="stats-badge"><strong id="stats-pending">0</strong> pending</span>
+            <span class="stats-badge stats-progress-badge">
+              <span class="progress-dot"></span>
+              <span id="stats-percent">0%</span> completed
+            </span>
+          </div>
+          <button class="btn btn-primary" id="btn-open-create-modal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add new
+          </button>
+        </div>
+      </header>
+
+      <!-- Document Page Title Section -->
+      <div class="page-title-section">
+        <h1 class="page-title">Taskly</h1>
+        <p class="page-description">
+          A minimal task management dashboard. Organise, track, and complete
+          your tasks using a clean, flat-layout database. Changes
+          automatically sync to the backend API.
+        </p>
+      </div>
+
+      <!-- Feed / Content Area -->
+      <div class="page-body">
+        <!-- Loader -->
+        <div class="loader-container" id="tasks-loader">
+          <div class="spinner"></div>
+          <p>Connecting to REST API...</p>
+        </div>
+
+        <!-- Task List Container (List/Database view) -->
+        <div class="tasks-list" id="tasks-grid-container" style="display: none">
+          <!-- Items injected dynamically via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="tasks-empty-state" style="display: none">
+          <div class="empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <h2>No tasks found</h2>
+          <p>
+            There are no tasks that match your search filters. Create one to
+            get started.
+          </p>
+          <button class="btn btn-secondary" id="btn-empty-create">
+            Create a task
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Notion-style Peek modal -->
+  <div class="modal-overlay" id="task-modal" style="display: none">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <span class="modal-emoji">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </span>
+          <h2 id="modal-title">New Task</h2>
+        </div>
+        <button class="btn-close" id="btn-close-modal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="task-form" class="task-form">
+        <!-- Task ID for updates -->
+        <input type="hidden" id="form-task-id" />
+
+        <div class="form-group title-group">
+          <input type="text" id="form-title" placeholder="Untitled" required />
+        </div>
+
+        <div class="form-properties">
+          <!-- Property Row: Category -->
+          <div class="property-row">
+            <span class="property-label">
+              <span class="property-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                  <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+              </span> Category
+            </span>
+            <div class="property-value">
+              <input type="text" id="form-category" list="category-suggestions" placeholder="Empty" />
+              <datalist id="category-suggestions">
+                <option value="Design"></option>
+                <option value="Backend"></option>
+                <option value="Frontend"></option>
+                <option value="UX/UI"></option>
+                <option value="General"></option>
+              </datalist>
+            </div>
+          </div>
+
+          <!-- Property Row: Due Date -->
+          <div class="property-row">
+            <span class="property-label"> Due Date
+            </span>
+            <div class="property-value">
+              <input type="date" id="form-due-date" />
+            </div>
+          </div>
+
+          <!-- Property Row: Priority -->
+          <div class="property-row">
+            <span class="property-label">
+              <span class="property-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+              </span> Priority
+            </span>
+            <div class="property-value">
+              <div class="priority-options">
+                <label class="priority-pill option-low">
+                  <input type="radio" name="priority" value="low" />
+                  <span>Low</span>
+                </label>
+                <label class="priority-pill option-medium">
+                  <input type="radio" name="priority" value="medium" checked />
+                  <span>Medium</span>
+                </label>
+                <label class="priority-pill option-high">
+                  <input type="radio" name="priority" value="high" />
+                  <span>High</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group desc-group">
+          <label class="section-label">Description</label>
+          <textarea id="form-description" rows="5" placeholder="Add detailed notes here..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-form">
+            Save changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Script -->
+  <script src="app.js"></script>
+</body>
+
+</html>
