@@ -5,7 +5,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  // Use a relative path so this works in both environments:
+  // - Local dev: Vite proxies /api → http://localhost:3001/api (see vite.config.js)
+  // - Production (Render): same-origin, Express serves /api directly
+  baseURL: '/api',
 });
 
 // Attach token to every request if present

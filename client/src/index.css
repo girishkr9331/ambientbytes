@@ -109,8 +109,8 @@ img {
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  /* Isolate so its compositing layer never bleeds into #root */
-  isolation: isolate;
+  /* No isolation/filter here — extra compositing layers trigger
+     a Chromium/Linux GPU bug that makes backdrop-filter siblings invisible */
 }
 
 .video-bg {
@@ -118,29 +118,24 @@ img {
   height: 100%;
   object-fit: cover;
   display: block;
-  /* Darken the video itself to avoid relying on backdrop-filter overlay */
-  filter: brightness(0.55) saturate(0.75);
+  /* No filter on the video — GPU-filtered video elements create a
+     compositing context that makes backdrop-filter children vanish on Render */
 }
 
 .video-bg-overlay {
   position: absolute;
   inset: 0;
-  /*new line*/
-  /* Plain rgba overlay — NO backdrop-filter here.
-     backdrop-filter with brightness/saturate on a fixed layer
-     creates a broken GPU compositing stacking context in
-     Chromium on Linux (Render), making all sibling z-layers invisible
-     once the video finishes its first load cycle. */
-  background: rgba(9, 12, 18, 0.52);
+  /* Solid rgba overlay — darkens the video without any backdrop-filter.
+     Slightly higher opacity compensates for removal of video filter. */
+  background: rgba(9, 12, 18, 0.72);
 }
 
 /* ─── App Shell ───────────────────────────────────────────── */
 #root {
   position: relative;
   z-index: 1;
-  /* Establish an isolated stacking context so fixed-position
-     video layer compositing never corrupts root paint order */
-  isolation: isolate;
+  /* No isolation:isolate — it was creating an extra stacking context
+     that caused backdrop-filter children to composite incorrectly */
 }
 
 .app-wrapper {
@@ -179,9 +174,8 @@ img {
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(12px) saturate(0.8);
-  -webkit-backdrop-filter: blur(12px) saturate(0.8);
-  background: rgba(13, 17, 23, 0.82);
+  /* backdrop-filter removed — causes GPU compositing bug on Render/Linux */
+  background: rgba(13, 17, 23, 0.96);
   border-bottom: 1px solid var(--border);
   padding: 0 24px;
   height: 60px;
@@ -270,9 +264,7 @@ img {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: rgba(22, 27, 34, 0.96);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(22, 27, 34, 0.98);
   border: 1px solid var(--border-2);
   border-radius: var(--radius-md);
   padding: 10px 14px;
@@ -367,9 +359,7 @@ img {
 
 .search-input {
   width: 100%;
-  background: rgba(22, 27, 34, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(22, 27, 34, 0.92);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 11px 14px 11px 42px;
@@ -405,9 +395,7 @@ img {
   font-weight: 500;
   border: 1px solid var(--border-2);
   color: var(--text);
-  background: rgba(22, 27, 34, 0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(22, 27, 34, 0.92);
   cursor: pointer;
   transition: all 0.2s var(--ease-out);
 }
@@ -456,9 +444,7 @@ img {
 }
 
 .post-card {
-  background: rgba(22, 27, 34, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(22, 27, 34, 0.92);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 24px 28px;
@@ -1348,8 +1334,8 @@ img {
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  /* backdrop-filter removed — GPU compositing bug on Render/Chromium Linux */
+  background: rgba(0, 0, 0, 0.75);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -1485,9 +1471,8 @@ img {
   top: calc(100% + 10px);
   right: 0;
   min-width: 160px;
-  background: rgba(22, 27, 34, 0.97);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(22, 27, 34, 0.99);
+  /* backdrop-filter removed — GPU compositing bug on Render/Chromium Linux */
   border: 1px solid var(--border-2);
   border-radius: var(--radius-md);
   padding: 6px;
@@ -1601,9 +1586,10 @@ img {
 .login-card {
   width: 100%;
   max-width: 400px;
-  background: rgba(22, 27, 34, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* backdrop-filter removed — this was the primary cause of the login page
+     going invisible on Render. The blur compositing layer collapsed when the
+     video background GPU layer initialized after full page load. */
+  background: rgba(22, 27, 34, 0.96);
   border: 1px solid var(--border-2);
   border-radius: var(--radius-xl);
   padding: 40px 36px;
