@@ -1,14 +1,11 @@
 export default function VideoBackground() {
   return (
     <div className="video-bg-wrap" aria-hidden="true">
-      <video
+      <img
         className="video-bg"
-        src="/backgrounds/background-scene.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
+        src="/backgrounds/background.webp"
+        alt=""
+        loading="eager"
       />
       {/* Dark overlay to keep text readable */}
       <div className="video-bg-overlay" />
