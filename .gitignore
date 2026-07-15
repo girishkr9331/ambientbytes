@@ -1,5 +1,4 @@
 node_modules/
-blog.db
 .env
 dist/
 ambientbytes_flowchart.drawio

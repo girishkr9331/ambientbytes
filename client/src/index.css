@@ -78,6 +78,24 @@ input,
 textarea,
 select {
   font-family: inherit;
+  color: var(--text);
+  background-color: var(--surface);
+  -webkit-text-fill-color: var(--text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-3);
+}
+
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset !important;
+  box-shadow: 0 0 0 1000px var(--surface) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  color: var(--text) !important;
+  background-color: var(--surface) !important;
 }
 img {
   max-width: 100%;
@@ -1027,13 +1045,12 @@ img {
   tab-size: 2 !important;
 }
 
-/* Textarea: invisible text so only the overlay renders,
-   keep the caret so the cursor position is visible */
+/* Keep editor text visible and readable while preserving the markdown preview */
 .w-md-editor-text-input {
-  color: transparent !important;
-  -webkit-text-fill-color: transparent !important;
-  caret-color: #58a6ff !important;
-  background: transparent !important;
+  color: var(--text) !important;
+  -webkit-text-fill-color: var(--text) !important;
+  caret-color: var(--accent) !important;
+  background: var(--surface) !important;
 }
 
 /* Overlay: render the visible text */
