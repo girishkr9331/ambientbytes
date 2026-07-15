@@ -47,7 +47,7 @@ app.get('/api/health', (req, res) => {
 // Serve built client app when available
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath, { maxAge: '1d' }));
-  app.get('*', (req, res) => {
+  app.get(/.*/, (req, res) => {
     if (req.path.startsWith('/api')) {
       return res.status(404).json({ error: 'API route not found' });
     }
