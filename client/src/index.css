@@ -121,7 +121,7 @@ img {
   object-fit: cover;
   display: block;
   /* No filter on the video — GPU-filtered video elements create a
-     compositing context that makes backdrop-filter children vanish on Render */
+     composi ting context that makes backdrop-filter children vanish on Render */
 }
 
 .video-bg-overlay {
